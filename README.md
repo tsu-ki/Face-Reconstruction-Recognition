@@ -1,90 +1,85 @@
-# Face Detection based CCTV Security System
+# Face-Reconstruction-Recognition System: AI-Powered CCTV Security System
 
-## Scenario
-Current surveillance systems lack
-efficient methods for detecting and
-managing unauthorized personnel
-within areas, leading to potential
-security breaches.
+[![GitHub license](https://img.shields.io/github/license/tsu-ki/Face-Reconstruction-Recognition)](https://github.com/your-username/Face-Reconstruction-Recognition/blob/main/LICENSE)
 
-Deploying a biometric system like ID
-card or iris scanner can be costly and
-might not be highly user friendly. So
-our motive was to come up with an
-idea which allows us to verify people
-without much of user involvement.
+## Overview
 
-## Objectives
-To develop a streamlined video processing
-pipeline integrating frame extraction, face
-detection, alignment, extraction, and finally,
+This project addresses the challenge of enhancing security and surveillance by accurately reconstructing and recognizing faces from low-quality CCTV footage. We leverage the power of CodeFormer, a state-of-the-art face restoration model, and Facenet for facial feature extraction, coupled with MongoDB Atlas Vector Search for efficient identification. 
 
-performing facial recognition against a pre-
-existing database to identify known individuals.
+## Key Features
 
-Develop a user-friendly web interface for
-administrators to receive alerts on detection of
-unfamiliar individuals. Admins can review alerts,
-add persons to the database for future
-recognition, or dismiss alerts.
+*   **Face Restoration with CodeFormer**: Employs CodeFormer's innovative VQGAN-Transformer architecture to enhance faces from degraded CCTV footage, overcoming challenges like low resolution, noise, and blur.
+*   **Facial Recognition with Facenet**: Extracts discriminative facial features using Facenet, enabling accurate identification by comparing against a database of known individuals.
+*   **Efficient Database Search**: Utilizes MongoDB Atlas Vector Search and its approximate k-nearest neighbors algorithm for fast and scalable face matching.
+*   **Streamlined Video Processing**: Implements a robust pipeline for frame extraction, face detection, alignment, restoration, and recognition.
+*   **User-Friendly Interface**: (To be developed) A web interface will allow administrators to manage alerts, review unfamiliar individuals, and update the database.
 
-## Used Methodology
-Input Footage: The process begins with video footage as
-input. A directory containing videos to be processed can be
-passed to our model.
+## Methodology
 
-Extract Frames at a Particular Rate: The video is broken
-down into individual frames using OpenCV . The "particular
-rate" refers to the number of frames extracted per second,
-considering the system's processing speed and system
-accuracy.We are extracting a frame at 3 seconds.
+1.  **Input Footage**: Processes video footage from a specified directory.
+2.  **Frame Extraction**: Extracts frames at a defined rate (e.g., one frame every 3 seconds) using OpenCV.
+3.  **Face Detection & Alignment**: Employs the RetinaFace Resnet50 model to detect and align faces within each frame.
+4.  **Face Restoration**: Enhances the quality of detected faces using CodeFormer.
+5.  **Feature Extraction**: Extracts facial feature vectors using Facenet.
+6.  **Matching & Recognition**: Compares extracted feature vectors against a database of known individuals using MongoDB Atlas Vector Search.
+7.  **Alerting & Management**: (Future implementation) A web interface will provide alerts and management tools for administrators.
 
-Detect Faces: Face detection model scans each frame to
-identify human faces. If a face is found, it pinpoints key
-facial features or landmarks (e.g., eyes, nose, mouth,
-etc.).We are employing RetinaFace Resnet50 model for face
-detection and extraction.
+## Getting Started
 
-Face Restoration: Face images captured in real-world
-scenarios often suffer from various issues such as low
-resolution, noise, blur, or lighting variations. These
-imperfections can negatively impact the accuracy of face
-recognition algorithms.
-We are employing CodeFormer for restoring the extracted
-faces.
+### Prerequisites
 
-CodeFormer: A novel method for blind face restoration that
-leverages a learned codebook space and a Transformer-
-based code prediction network to enhance the quality of
-degraded face images. It aims to reduce uncertainty in
-restoration mapping and has shown superior performance
-compared to existing methods in blind face restoration
-tasks, as well as in tasks such as face color enhancement,
-face inpainting, old photo enhancement.
+*   **Python 3.x**: Ensure you have Python 3.x installed.
+*   **Dependencies**: Install the required libraries using:
+    ```bash
+    pip install -r requirements.txt
+    ```
+*   **Pretrained Models**: Download the necessary pretrained models using the provided scripts:
+    ```bash
+    python download_pretrained_models.py
+    ```
+*   **MongoDB Atlas Setup**: 
+    * Set up a MongoDB Atlas cluster and enable Vector Search.
+    * Configure your connection credentials in `settings.py`.
 
-After restoring the extracted faces, the next step involves
-passing them through the Facenet Model.
-Facenet is a specialized model designed for facial feature
-extraction, capable of encoding facial characteristics into a
-high-dimensional feature space.
-By employing Facenet, the restored faces are transformed
-into compact and representative feature vectors, enabling
-efficient comparison, recognition, and analysis of facial
-attributes.
+### Running the Model
 
-Match Feature Vector with Pre-existing Vectors in Database
-of Recognized Persons: The extracted feature vector is
-compared against a database of known persons. Each
-person in this database also has a corresponding feature
-vector. The system aims to find a close match.
-We are using MongoDB Atlas Vector Search Database
+1.  **Frame Extraction (for videos)**:
+    *   Place your video files in the `videos/ch5` directory (or modify the `VIDEO_DIRPATH` in `settings.py`).
+    *   Run the frame extractor:
+        ```bash
+        python main.py
+        ```
+    *   This will extract frames from your videos and save them in the `out_dir` directory.
 
-The key algorithm behind MongoDB Atlas Vector Search is
-approximate k-nearest neighbors (k-NN). Let's break down
-what this means:
-Approximate k-nearest neighbors (approximate k-NN): This
-is a technique used to find the k data points in a dataset
-that are closest to a given query point. The "nearest
-neighbors" are the data points whose vectors are most
-similar to the query vector.
+2.  **Face Restoration & Recognition**:
+    *   For **images**:
+        ```bash
+        python inference_codeformer.py -i <path_to_your_image>
+        ```
+    *   For **videos**:
+        ```bash
+        python inference_codeformer.py -i <path_to_your_video>
+        ```
+    *   The restored faces will be saved in the `results` directory, and their embeddings will be sent to the MongoDB Atlas database for recognition.
 
+3.  **Other Tasks**:
+    *   **Inpainting**:
+        ```bash
+        python inference_inpainting.py -i <path_to_your_masked_image> --mask_path <path_to_your_mask>
+        ```
+    *   **Colorization**:
+        ```bash
+        python inference_colorization.py -i <path_to_your_grayscale_image>
+
+## Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Acknowledgments
+
+*   We extend our gratitude to the creators of CodeFormer and Facenet for their groundbreaking work.
+*   We also acknowledge the contributions of the open-source community for providing valuable tools and resources.
